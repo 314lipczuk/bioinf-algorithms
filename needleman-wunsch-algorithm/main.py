@@ -24,6 +24,25 @@ G = -2 # gap pen
 seq1, seq2 = "GCATGCG", "GATTACA"
 seq1, seq2 = "AATCG", "AACG"
 
+class Config:
+  def from_matrix(self, m):
+    self.matrix = m
+    return self
+
+  def from_rules(self, r, size=4):
+    keys = r.keys()
+    assert 'match' in keys and 'mismatch' in keys # perhaps add indel (insertion/deletion) also someday
+    assert size > 0
+    self.matrix = [[r['match'] if i==j else r['mismatch'] for i in range(size)] for j in range(size)]
+    return self
+
+  def with_penalty(self, p):
+    self.penalty = p
+    return self
+
+  def lookup(self, a, b):
+    return self.matrix[base_idx[a]][base_idx[b]]
+
 class Direction(Enum):
   DONE = 0
   DIAG = 1
@@ -38,15 +57,14 @@ def make_initial_matrix(seq1, seq2):
   return m
 
 R = make_initial_matrix(seq1, seq2)
-
-#print(R)
+config = Config().from_matrix(S).with_penalty(R)
 
 def fill_single(m, pos):
   j,i = pos
   assert i > 0 and j > 0
   l_j, l_i = [seq2[j-1], seq1[i-1]]
   score = max([
-    [(m[j-1][i-1][0] + S[base_idx[l_j]][base_idx[l_i]]), Direction.DIAG],
+    [(m[j-1][i-1][0] + config.lookup(l_j, l_i)), Direction.DIAG],
     [(m[j-1][i][0] + G), Direction.UP],
     [(m[j][i-1][0] + G), Direction.LEFT],
     ], key=lambda x: x[0])
@@ -61,7 +79,6 @@ def fill(m):
 def solve(m):
   solution = []
   j, i = len(m)-1, len(m[0])-1
-  #current_node = m[j][i]
   while True:
     current_node = m[j][i]
     match current_node[1]:

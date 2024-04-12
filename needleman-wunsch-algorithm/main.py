@@ -1,13 +1,6 @@
 from enum import Enum
 
-
-S = [
-	# A  G   C   T
-	[3, -1, -2, -2], # A
-	[-1, 3, -2, -2], # G
-	[-2, -2, 3, -1], # C
-	[-2, -2, -1, 3]  # T
-	]
+# TODO: score of the alignment
 
 S = [
 	# A  G   C   T
@@ -18,10 +11,8 @@ S = [
 	]
 
 base_idx = { 'A' : 0, 'G' : 1, 'C' : 2, 'T' : 3 }
-G = -4 # gap pen
 G = -2 # gap pen
 
-seq1, seq2 = "GCATGCG", "GATTACA"
 seq1, seq2 = "AATCG", "AACG"
 
 class Config:
@@ -79,8 +70,10 @@ def fill(m):
 def solve(m):
   solution = []
   j, i = len(m)-1, len(m[0])-1
+  score = 0
   while True:
     current_node = m[j][i]
+    score += current_node[0]
     match current_node[1]:
       case Direction.DONE:
         break
@@ -100,12 +93,11 @@ def solve(m):
   for s in solution:
     l1 += s[0]
     l2 += s[1]
-  return l1,l2
+  return l1,l2, score
 
 def print_matrix(m):
   for r in m:
    print(r) 
 
 fill(R)
-print_matrix(R)
 print(solve(R))

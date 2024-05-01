@@ -19,41 +19,6 @@ def find_matches(seq1, seq2, matching_Nmers=30):
       hits.append((hit, i))
   return hits
 
-
-# their plotting code, TODO: write my own
-# def makeDotplot(filename, hits):
-#     """generate a dotplot from a list of hits
-#        filename may end in the following file extensions:
-#          *.ps, *.png, *.jpg
-#     """
-#     x, y = zip(* hits)
-
-#     slope1 = 1.0e6 / (825000 - 48000)
-#     slope2 = 1.0e6 / (914000 - 141000)
-#     offset1 = 0 - slope1*48000
-#     offset2 = 0 - slope2*141000
-
-#     hits2 = quality(hits)
-#     print("%.5f%% hits on diagonal" % (100 * len(hits2) / float(len(hits))))
-
-#     # create plot
-#     p = plotting.Gnuplot()
-#     p.enableOutput(False)
-#     p.plot(x, y, xlab="sequence 2", ylab="sequence 1")
-#     p.plotfunc(lambda x: slope1 * x + offset1, 0, 1e6, 1e5)
-#     p.plotfunc(lambda x: slope2 * x + offset2, 0, 1e6, 1e5)
-
-#     # set plot labels
-#     p.set(xmin=0, xmax=1e6, ymin=0, ymax=1e6)
-#     p.set(main="dotplot (%d hits, %.5f%% hits on diagonal)" %
-#           (len(hits), 100 * len(hits2) / float(len(hits))))
-#     p.enableOutput(True)
-
-#     # output plot
-#     p.save(filename)
-
-#     return p
-
 def read_fasta(fn):
   s = ''
   with open(fn,'r') as f:
@@ -80,8 +45,8 @@ def quality(hits):
     return goodhits
 
 def plot_and_save(data, filename):
-  x=list(map(lambda x:x[0], data))
-  y=list(map(lambda x:x[1], data))
+  x = list(map(lambda x:x[0], data))
+  y = list(map(lambda x:x[1], data))
   fig = plt.figure()
   plot = fig.add_subplot()
   plot.scatter(x,y)

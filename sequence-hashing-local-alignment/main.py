@@ -1,22 +1,25 @@
 import sys
 from matplotlib import pyplot
 import os
+import unittest
+import sys
 
 # exercise taken from MIT OCW 6.047 Computational Biology course, assignment 1, exercise 2
 # along with makeDotplot fn
 
-def find_matches(seq1, seq2):
+def find_matches(seq1, seq2, matching_Nmers=30):
   lookup = {}
-  matching_Nmers = 30
   assert len(seq1) > matching_Nmers and len(seq2) > matching_Nmers
-  for i in range(len(seq1) - matching_Nmers + 1):
+  breakpoint()
+  for i in range(len(seq1) - matching_Nmers +1):
     lookup.setdefault(seq1[i:i+matching_Nmers], []).append(i)
 
   hits = []
-  for i in range(len(seq2) - matching_Nmers + 1):
-    hash = seq1[i:i+matching_Nmers]
+  for i in range(len(seq2) - matching_Nmers + 1 ):
+    hash = seq2[i:i+matching_Nmers]
     for hit in lookup.get(hash, []):
       hits.append((hit, i))
+  
   return hits
 
 
@@ -60,9 +63,6 @@ def read_fasta(fn):
     s = ''.join(f.read().split('\n')[1:])
   return s
 
-
-
-
 def quality(hits):
     """determines the quality of a list of hits"""
 
@@ -83,7 +83,34 @@ def quality(hits):
     return goodhits
 
 
-seq1 = read_fasta('../.static/ps1docs/human-hoxa-region.fa')
-seq2 = read_fasta('../.static/ps1docs/mouse-hoxa-region.fa')
-matches = find_matches(seq1, seq2)
-plot('matches.png', matches)
+def main():
+  seq1 = read_fasta('../.static/ps1docs/human-hoxa-region.fa')
+  seq2 = read_fasta('../.static/ps1docs/mouse-hoxa-region.fa')
+  matches = find_matches(seq1, seq2)
+
+def test():
+  unittest.main()
+
+class LocalAlignTester(unittest.TestCase):
+  def test_findsbasic(self):
+    s1 = ("a" * 30) + "dcb"
+    s2 = ("a" * 30) + "bcd"
+    matches = find_matches(s1, s2)
+    eq = [(0,0)]
+    self.assertEqual(len(eq), len(matches))
+    for i, m in enumerate(matches):
+      self.assertEqual(eq[i][0],m[0])
+      self.assertEqual(eq[i][1],m[1])
+
+  def test_findsame(self):
+    s1 = ("a" * 30) + "cda"
+    s2 = ("a" * 30) + "cda"
+    matches = find_matches(s1, s2)
+    eq = [(x,x) for x in range(4)]
+    self.assertEqual(len(eq), len(matches))
+    for i, m in enumerate(matches):
+      self.assertEqual(eq[i][0],m[0])
+      self.assertEqual(eq[i][1],m[1])
+
+if __name__ == '__main__':
+  test()

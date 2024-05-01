@@ -1,6 +1,6 @@
 import sys
-from matplotlib import pyplot
 import os
+from matplotlib import pyplot as plt
 import unittest
 import sys
 
@@ -79,10 +79,19 @@ def quality(hits):
 
     return goodhits
 
+def plot_and_save(data, filename):
+  x=list(map(lambda x:x[0], data))
+  y=list(map(lambda x:x[1], data))
+  fig = plt.figure()
+  plot = fig.add_subplot()
+  plot.scatter(x,y)
+  fig.savefig(filename)
+
 
 def main():
   seq1 = read_fasta('../.static/ps1docs/human-hoxa-region.fa')
   seq2 = read_fasta('../.static/ps1docs/mouse-hoxa-region.fa')
   matches = find_matches(seq1, seq2)
+  plot_and_save(matches, 'figure.png')
 
 if __name__ == '__main__': main()

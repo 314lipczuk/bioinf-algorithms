@@ -10,16 +10,13 @@ import sys
 def find_matches(seq1, seq2, matching_Nmers=30):
   lookup = {}
   assert len(seq1) > matching_Nmers and len(seq2) > matching_Nmers
-  breakpoint()
   for i in range(len(seq1) - matching_Nmers +1):
     lookup.setdefault(seq1[i:i+matching_Nmers], []).append(i)
-
   hits = []
   for i in range(len(seq2) - matching_Nmers + 1 ):
     hash = seq2[i:i+matching_Nmers]
     for hit in lookup.get(hash, []):
       hits.append((hit, i))
-  
   return hits
 
 

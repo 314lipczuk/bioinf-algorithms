@@ -1,5 +1,5 @@
 import sys
-from math import log
+from math import log, exp
 from matplotlib import pyplot as plt
 
 # DISCLAIMER: the setup code was taken from OCW 6.047/6.878/HST.507 Fall 2015, assignment 1, task 3
@@ -83,6 +83,7 @@ def viterbi(X):
             ])
             # tr [from] [to]
             # p_kl = probability of translation from l to k
+            #V[i][k] = c1 + c2
             V[i][k] = c1 + c2
 
 
@@ -91,7 +92,7 @@ def viterbi(X):
             # k - transition
             # i - state
             # get max of possible 
-            TB[i][k] =  0 if Vprev[0] > Vprev[1] else 1
+            TB[i][k] =  0 if Vprev[0] >= Vprev[1] else 1
 
     # perform traceback and return the predicted hidden state sequence
     Y = [-1 for i in range(L)]
@@ -99,12 +100,14 @@ def viterbi(X):
     Y[L-1] = yL
     for i in range(L-2,-1,-1):
         Y[i] = TB[i+1][Y[i+1]]
-    breakpoint()
     return Y
 
 ###############################################################################
 # ANNOTATION BENCHMARKING
 ###############################################################################
+def log_sum_exp(a, b):
+    return a + log(1 + exp(b - a))
+
 
 def basecomp(X,anno):
     counts = [[0]*4,[0]*4]

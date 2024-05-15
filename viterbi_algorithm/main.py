@@ -1,5 +1,6 @@
 import sys
 from math import log
+from matplotlib import pyplot as plt
 
 # DISCLAIMER: the setup code was taken from OCW 6.047/6.878/HST.507 Fall 2015, assignment 1, task 3
 # implementation is my own
@@ -71,15 +72,26 @@ def viterbi(X):
             p_pl - probability of the transition from state l to state k
             """
             
+            # c1 - depends on N and k - lookup at em table
 
-            c2 = max( [] )
-            V[i][k] = 
+            c1 = log(em[k][X[i]])
+            c2 = max([
+                #ph(X[i]), i-1) + p_ss
+                Vprev[0] + log(tr[0][k]),
+                #pl(X[i]), i-1) + p_ss
+                Vprev[1] + log(tr[1][k]),
+            ])
+            # tr [from] [to]
+            # p_kl = probability of translation from l to k
+            V[i][k] = c1 + c2
+
 
             # Set TB[i][k] to the selected previous state (0 or 1 corresponding
             #  to + or -)
             # k - transition
             # i - state
             # get max of possible 
+            TB[i][k] =  0 if Vprev[0] > Vprev[1] else 1
 
     # perform traceback and return the predicted hidden state sequence
     Y = [-1 for i in range(L)]
@@ -87,6 +99,7 @@ def viterbi(X):
     Y[L-1] = yL
     for i in range(L-2,-1,-1):
         Y[i] = TB[i+1][Y[i+1]]
+    breakpoint()
     return Y
 
 ###############################################################################
@@ -135,12 +148,12 @@ def print_annostats(X,anno,filename):
     print( "Low-GC base composition:",)
     print_basecomp(basecomps[1])
 
-    print( "Saving High-GC length histogram to %s_highgc.png" % filename)
-    p = plothist(lengths[0],low=0)
-    p.save(filename+"_highgc.png")
+    print( "Saving High-GC length histogram to %s_high_gc.png" % filename)
+    #p = plothist(lengths[0],low=0)
+    p = plot_and_save(lengths[0], 'high_gc.png')
     print( "Saving Low-GC length histogram to %s_lowgc.png" % filename)
-    p = plothist(lengths[1],low=0)
-    p.save(filename+"_lowgc.png")
+    #p = plothist(lengths[1],low=0)
+    plot_and_save(lengths[1], "low_gc.png")
 
 ###############################################################################
 # MAIN
@@ -178,6 +191,14 @@ def main():
     print_annostats(X,vanno,datafile+"_viterbi")
     print( "")
     print( "Accuracy: %.2f%%" % (100*anno_accuracy(refanno,vanno)))
+
+def plot_and_save(data, filename):
+  #x = list(map(lambda x:x[0], data))
+  #y = list(map(lambda x:x[1], data))
+  fig = plt.figure()
+  plot = fig.add_subplot()
+  plot.hist(data)
+  fig.savefig(filename)
 
 if __name__ == "__main__":
     main()

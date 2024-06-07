@@ -1,5 +1,5 @@
 import sys
-from math import log, exp
+from math import log2 as log, exp
 from matplotlib import pyplot as plt
 
 # DISCLAIMER: the setup code was taken from OCW 6.047/6.878/HST.507 Fall 2015, assignment 1, task 3
@@ -17,12 +17,19 @@ state_idx = { '+' : 0, '-' : 1 }
 # initial distribution over states, i.e. probability of starting in state k
 init_dist = [0.5,0.5]
 
-# transition probabilities
+# transition probabilities -- Original
 tr = [
     #  to+   to-
     [ 0.99, 0.01 ], # from+
     [ 0.01, 0.99 ]  # from-
 ]
+
+# transition probabilities -- Test ones
+#tr = [
+#    #  to+   to-
+#    [ 0.5, 0.5 ], # from+
+#    [ 0.6, 0.4 ]  # from-
+#]
 
 
 # emission probabilities
@@ -31,6 +38,12 @@ em = [
     [ 0.20, 0.30, 0.30, 0.20], # +
     [ 0.30, 0.20, 0.20, 0.30]  # -
 ]
+
+#em = [
+#    #    A     G     C     T
+#    [ 0.20, 0.30, 0.30, 0.20], # +
+#    [ 0.30, 0.20, 0.20, 0.30]  # -
+#]
 
 ###############################################################################
 # VITERBI ALGORITHM (you must complete)
@@ -49,8 +62,8 @@ def viterbi(X):
     L = len(X)
     assert len(em) == N
 
-    V = [[0]*N for _ in range(L)]
-    TB = [[0]*N for _ in range(L)]
+    V = [[0] * N for _ in range(L)]
+    TB = [[0] * N for _ in range(L)]
     
     for i in range(0,L):
         Vprev = []
@@ -71,28 +84,14 @@ def viterbi(X):
             p_k - probability of the most probable path ending at position x-1 in state k with element j
             p_pl - probability of the transition from state l to state k
             """
-            
-            # c1 - depends on N and k - lookup at em table
-
-            c1 = log(em[k][X[i]])
-            c2 = max([
-                #ph(X[i]), i-1) + p_ss
-                Vprev[0] + log(tr[0][k]),
-                #pl(X[i]), i-1) + p_ss
-                Vprev[1] + log(tr[1][k]),
-            ])
-            # tr [from] [to]
-            # p_kl = probability of translation from l to k
-            #V[i][k] = c1 + c2
-            V[i][k] = c1 + c2
-
-
-            # Set TB[i][k] to the selected previous state (0 or 1 corresponding
-            #  to + or -)
-            # k - transition
-            # i - state
-            # get max of possible 
-            TB[i][k] =  0 if Vprev[0] >= Vprev[1] else 1
+            if i == 0:
+               V[i][k] = log(init_dist[k]) + log(em[k][X[i]])
+            else:
+               max_prob, max_state = max(
+                   [(Vprev[j] + log(tr[j][k]) + log(em[k][X[i]]), j) for j in range(N)] , key= lambda x:x[0]
+               )
+               V[i][k] = max_prob
+               TB[i][k] = max_state
 
     # perform traceback and return the predicted hidden state sequence
     Y = [-1 for i in range(L)]
